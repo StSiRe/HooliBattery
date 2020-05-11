@@ -35,6 +35,7 @@ class HooliBattery{
         void ChangeMaxVoltage(float voltage);
         //Текущий заряд батареи в процентах
         int GetCurrentBatteryPower();
+        void CheckBattery();
 
         void onDischarged(callbackFunction discharged);
         void onCharged(callbackFunction charged);

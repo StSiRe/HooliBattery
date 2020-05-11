@@ -65,38 +65,43 @@ void HooliBattery::on10Percent(callbackFunction on10)
 void HooliBattery::Tick()
 {
     for(;;)
-    {
+    {        
         Delay(5000);//Смотрим на состояние батареи раз в 5 секунд
-        int value = analogRead(HooliBattery::pin);
-        //3.3 - 4096
-        // x  - value
-        // Преобразовать считанное значение в напряжение
-        float voltagePin = MCUADCVoltage*float(value) / Pow(2,ADCWidthBIT);
-        // Просчитать напряжение на входе
-        float battV = voltagePin * (resS+resG) / resG;
-        //U = U2*(R1+R2)/R2
-        //Считаем процент заряда
-        float battP = (MaxVoltage - battV) / MaxVoltage * 100;
-        batteryPower = battP;
-        //-----------Отностительно результатов вызываем события
-        if(batteryPower >= 96)
-        {
-            if(_onCharged)  _onCharged();
-        }
-        else if(batteryPower <= 4)
-        {
-            if(_onDischarged)   _onDischarged();
-        }
-        else
-        {
-            if(batteryPower == 30)
-                if(_on30)   _on30();
-            else if(batteryPower == 20)
-                if(_on20)   _on20();
-            else if(batteryPower == 10)
-                if(_on10)   _on10();
-        }
+        CheckBattery();
     }
+}
+void HooliBattery::CheckBattery()
+{
+    int value = analogRead(HooliBattery::pin);
+    //3.3 - 4096
+    // x  - value
+    // Преобразовать считанное значение в напряжение
+    float voltagePin = MCUADCVoltage*float(value) / Pow(2,ADCWidthBIT);
+    // Просчитать напряжение на входе
+    float battV = voltagePin * (resS+resG) / resG;
+    //U = U2*(R1+R2)/R2
+    //Считаем процент заряда
+    float battP = (MaxVoltage - battV) / MaxVoltage * 100;
+    batteryPower = battP;
+    //-----------Отностительно результатов вызываем события
+    if(batteryPower >= 96)
+    {
+        if(_onCharged)  _onCharged();
+    }
+    else if(batteryPower <= 4)
+    {
+        if(_onDischarged)   _onDischarged();
+    }
+    else
+    {
+        if(batteryPower == 30)
+            if(_on30)   _on30();
+        else if(batteryPower == 20)
+            if(_on20)   _on20();
+        else if(batteryPower == 10)
+            if(_on10)   _on10();
+    }
+    // It`s all:)
 }
 int Pow(int base,int st)
 {
