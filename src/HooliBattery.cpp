@@ -3,9 +3,27 @@ HooliBattery::HooliBattery(int pin,HooliBattery::BatteryType type)
 {
     HooliBattery::pin = pin;
     pinMode(pin,INPUT);
-    
-
+    #if defined(ESP32)
+    xTaskCreate(this->TaskCheckBattery,"HooliBattery",4096,NULL,1,NULL);
+    #endif
 }
+#if defined(ESP32)
+void HooliBattery::TaskCheckBattery(void *pvParam)
+{
+    while(true)
+    {
+        HooliBattery::_checkBattery();
+        vTaskDelay(5000/portTICK_PERIOD_MS);
+    }
+    vTaskDelay(NULL);
+}
+#else 
+void HooliBattery::CheckBattery()
+{
+    HooliBattery::_checkBattery();
+}
+#endif
+
 void HooliBattery::SelectMinMaxByType(HooliBattery::BatteryType type)
 {
     if(type == HooliBattery::LiPol)
@@ -62,15 +80,8 @@ void HooliBattery::on10Percent(callbackFunction on10)
 //  |        |           U2
 //  |        |           |
 // Ground ---------------
-void HooliBattery::Tick()
-{
-    for(;;)
-    {        
-        Delay(5000);//Смотрим на состояние батареи раз в 5 секунд
-        CheckBattery();
-    }
-}
-void HooliBattery::CheckBattery()
+
+void HooliBattery::_checkBattery()
 {
     int value = analogRead(HooliBattery::pin);
     //3.3 - 4096

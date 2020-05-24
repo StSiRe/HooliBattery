@@ -2,6 +2,13 @@
 #ifndef HooliBattery_h
 #define HooliBattery_h
 
+#if defined(ESP32)
+#include<ESP.h>
+#include<FreeRTOS.h>
+#elif defined(ARDUINO)
+#include <Arduino.h>
+#endif
+
 extern "C" {
 typedef void (*callbackFunction)(void);
 }
@@ -35,13 +42,16 @@ class HooliBattery{
         void ChangeMaxVoltage(float voltage);
         //Текущий заряд батареи в процентах
         int GetCurrentBatteryPower();
-        void CheckBattery();
 
         void onDischarged(callbackFunction discharged);
         void onCharged(callbackFunction charged);
         void on30Percent(callbackFunction on30);
         void on20Percent(callbackFunction on20);
         void on10Percent(callbackFunction on10);
+        #if defined(ARDUINO)
+        void CheckBattery();
+        #endif
+        
     private:
         float MCUADCVoltage = 3.3;
         int ADCWidthBIT = 12;
@@ -74,9 +84,11 @@ class HooliBattery{
         callbackFunction _on20 = NULL;
 
         callbackFunction _on10 = NULL;
-
+        void _checkBattery();
+        #if defined(ESP32)
+        void TaskCheckBattery(void *pvParam);
+        #endif
         int pin;
-        void Tick();
         float MinVoltage = 2.5;
         float MaxVoltage = 4.25;
         void SelectMinMaxByType(HooliBattery::BatteryType type);
