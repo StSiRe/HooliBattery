@@ -2,10 +2,18 @@
 HooliBattery::HooliBattery(int pin,HooliBattery::BatteryType type)
 {
     HooliBattery::pin = pin;
+    SelectMinMaxByType(type);
     pinMode(pin,INPUT);
     #if defined(ESP32)
     xTaskCreate(this->TaskCheckBattery,"HooliBattery",4096,NULL,1,NULL);
+    HooliBattery::ADCWidthBIT = 12;
+    HooliBattery::MCUADCVoltage = 3.3;
+    #elif defined(ARDUINO)
+    HooliBattery::ADCWidthBIT = 10;
+    HooliBattery::MCUADCVoltage = 5.0;
     #endif
+    Serial.println(ADCWidthBIT);
+
 }
 #if defined(ESP32)
 void HooliBattery::TaskCheckBattery(void *pvParam)
@@ -83,16 +91,39 @@ void HooliBattery::on10Percent(callbackFunction on10)
 
 void HooliBattery::_checkBattery()
 {
+
+    //#if defined(ESP32)
+    //int res = 0;
+    //for(int i = 0;i< 5;i++)
+    //{
+    //    res += analogRead(HooliBattery::pin);
+    //    vTaskDelay(500/portTICK_PERIOD_MS);
+    //}
+    //int value = res / 5;//Вычисляем средне-арифмитическое
+    //#elif defined(ARDUINO)
+    //if(TicksCounter < 5)
+    //{
+    //    TicksValue += analogRead(HooliBattery::pin);
+    //    TicksCounter++;
+    //    return;
+    //}
+    //TicksCounter = 0;
+    //int value = TicksValue / 5;
+    //TicksValue = 0;
+    //#endif
     int value = analogRead(HooliBattery::pin);
     //3.3 - 4096
     // x  - value
     // Преобразовать считанное значение в напряжение
-    float voltagePin = MCUADCVoltage*float(value) / Pow(2,ADCWidthBIT);
+    float voltagePin = MCUADCVoltage*float(value) / float(Pow(2,ADCWidthBIT));
+
     // Просчитать напряжение на входе
     float battV = voltagePin * (resS+resG) / resG;
+    
     //U = U2*(R1+R2)/R2
     //Считаем процент заряда
-    float battP = (MaxVoltage - battV) / MaxVoltage * 100;
+    //float battP = 100 - (-MaxVoltage + battV) / MaxVoltage * 100;
+    float battP = (battV - MinVoltage) / (MaxVoltage - MinVoltage) * 100;
     batteryPower = battP;
     //-----------Отностительно результатов вызываем события
     if(batteryPower >= 96)
@@ -114,13 +145,14 @@ void HooliBattery::_checkBattery()
     }
     // It`s all:)
 }
-int Pow(int base,int st)
+int HooliBattery::Pow(int base,int st)
 {
+    int res = 1;
     for (size_t i = 0; i < st; i++)
     {
-        base = base*base;
+        res = res*base;
     }
-    return base;
+    return res;
 }
 int HooliBattery::GetCurrentBatteryPower()
 {
