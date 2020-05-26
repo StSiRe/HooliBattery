@@ -8,12 +8,13 @@ HooliBattery::HooliBattery(int pin,HooliBattery::BatteryType type)
     xTaskCreate(this->TaskCheckBattery,"HooliBattery",4096,NULL,1,NULL);
     HooliBattery::ADCWidthBIT = 12;
     HooliBattery::MCUADCVoltage = 3.3;
-    #elif defined(ARDUINO)
+    #elif defined(__SAM3X8E__)//Arduino Due
+    HooliBattery::ADCWidthBIT = 12;
+    HooliBattery::MCUADCVoltage = 3.3;
+    #elif defined(__AVR__)//All Arduino Uno/nano/mega/etc
     HooliBattery::ADCWidthBIT = 10;
     HooliBattery::MCUADCVoltage = 5.0;
     #endif
-    Serial.println(ADCWidthBIT);
-
 }
 #if defined(ESP32)
 void HooliBattery::TaskCheckBattery(void *pvParam)
@@ -101,15 +102,15 @@ void HooliBattery::_checkBattery()
     //}
     //int value = res / 5;//Вычисляем средне-арифмитическое
     //#elif defined(ARDUINO)
-    //if(TicksCounter < 5)
+    //if(ticksCounter < 5)
     //{
-    //    TicksValue += analogRead(HooliBattery::pin);
-    //    TicksCounter++;
+    //    ticksValue += analogRead(HooliBattery::pin);
+    //    ticksCounter++;
     //    return;
     //}
-    //TicksCounter = 0;
-    //int value = TicksValue / 5;
-    //TicksValue = 0;
+    //ticksCounter = 0;
+    //int value = ticksValue / 5;
+    //ticksValue = 0;
     //#endif
     int value = analogRead(HooliBattery::pin);
     //3.3 - 4096

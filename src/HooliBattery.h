@@ -19,6 +19,11 @@ class HooliBattery{
             LiPol = 1,
             LiFePO4 = 2
         };
+        //Состояния батареи
+        enum LifeCycle{
+            Charging = 0,
+            Discharging = 1
+        };
 
         //pin - Номер пина, к которому подключен резисторный делитель
         //type - Тип батареи
@@ -51,7 +56,7 @@ class HooliBattery{
         //Установить максимальное напряжение при котором заряд батареи - 100%
         void ChangeMaxVoltage(float voltage);
 
-        //Возвращяет текущий заряд батареи в процентах
+        //[Returns] Возвращяет текущий заряд батареи в процентах
         int GetCurrentBatteryPower();
 
         //Происходит при заряде батареи меньше 4%
@@ -73,6 +78,9 @@ class HooliBattery{
         //Происходит при заряде батареи на 10%
         //on10 - функция выполняющаяся при данном событии
         void on10Percent(callbackFunction on10);
+
+        //[Returns] Возвращает текущий процесс (зарядка и разрядка)
+        LifeCycle GetLifeCycle();
 
         #if defined(ARDUINO)
         //Проверка состояния батареи
@@ -99,8 +107,6 @@ class HooliBattery{
         float resS = 100;//10000
         //Сопротивление нижнего резистора
         float resG = 270;//5000
-        //Подсчет заряда батареи в процентах
-        int CalculateBatteryPower();
         //События,которые мы отслеживаем
         callbackFunction _onDischarged = NULL;
 
@@ -111,19 +117,28 @@ class HooliBattery{
         callbackFunction _on20 = NULL;
 
         callbackFunction _on10 = NULL;
+        //Проверка текущего заряда
         void _checkBattery();
+
+        //Текущее состояние батареи
+        //В начале считаем,что идет разрядка(информация обновиться через 10 измерений)
+        LifeCycle batteryLifeCycle = LifeCycle::Discharging;
         #if defined(ESP32)
         void TaskCheckBattery(void *pvParam);
         #elif defined(ARDUINO)
         // Используется для подсчета кол-ва проверок состояния батареи(для обхода необходимости делать задержку) 
-        int TicksCounter = 0;
+        int ticksCounter = 0;
         // Используется для подсчета напряжения в промежутках между оценкой заряда(для обхода необходимости делать задержку) 
-        int TicksValue = 0;
+        int ticksValue = 0;
         #endif
         int pin;
         float MinVoltage = 2.5;
         float MaxVoltage = 4.25;
+        //Устанавливает лимиты напряжений для данного типа аккумулятора
+        //type - Тип аккумулятора
         void SelectMinMaxByType(HooliBattery::BatteryType type);
+
+        //Возведение в степень числа
         int Pow(int base,int st);
         
 };
