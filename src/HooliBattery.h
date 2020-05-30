@@ -35,26 +35,11 @@ class HooliBattery{
         //resG - сопротивление нижнего плеча
         HooliBattery(int pin,BatteryType type,int resS,int resG);
 
-        //pin - Номер пина, к которому подключен резисторный делитель
-        //type - Тип батареи
-        //resS - сопротивление верхнего плеча 
-        //resG - сопротивление нижнего плеча
-        //sourseV - напряжение подаваемое на верхнее плечо
-        HooliBattery(int pin,BatteryType type,int resS,int resG,float sourseV);
-
-        //pin - Номер пина, к которому подключен резисторный делитель
-        //type - Тип батареи
-        //resS - сопротивление верхнего плеча 
-        //resG - сопротивление нижнего плеча
-        //sourseV - напряжение подаваемое на верхнее плечо
-        //groundV - напряжение подаваемое на нижнее плечо
-        HooliBattery(int pin,BatteryType type,int resS,int resG,float sourseV,float groundV);
-
         //Установить минимальное напряжение при котором заряд батареи - 0%
-        void ChangeMinVoltage(float voltage);
+        void SetMinVoltage(float voltage);
 
         //Установить максимальное напряжение при котором заряд батареи - 100%
-        void ChangeMaxVoltage(float voltage);
+        void SetMaxVoltage(float voltage);
 
         //[Returns] Возвращяет текущий заряд батареи в процентах
         int GetCurrentBatteryPower();
@@ -104,9 +89,9 @@ class HooliBattery{
         //напряжение подаваемое на верхнее плечо
         float sourseV = 3.3;
         //Сопротивление верхнего резистора
-        float resS = 100;//10000
+        float resS = 10000;//10000
         //Сопротивление нижнего резистора
-        float resG = 270;//5000
+        float resG = 5000;//5000
         //События,которые мы отслеживаем
         callbackFunction _onDischarged = NULL;
 
@@ -134,6 +119,7 @@ class HooliBattery{
         int pin;
         float MinVoltage = 2.5;
         float MaxVoltage = 4.25;
+
         //Устанавливает лимиты напряжений для данного типа аккумулятора
         //type - Тип аккумулятора
         void SelectMinMaxByType(HooliBattery::BatteryType type);

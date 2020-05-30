@@ -16,11 +16,21 @@ HooliBattery::HooliBattery(int pin,HooliBattery::BatteryType type)
     HooliBattery::MCUADCVoltage = 5.0;
     #endif
 }
+
+HooliBattery::HooliBattery(int pin,HooliBattery::BatteryType type,int resS,int resG)
+{
+    HooliBattery(pin,type);
+    HooliBattery::resS = resS;
+    HooliBattery::resG = resG;
+}
+
+
 #if defined(ESP32)
 void HooliBattery::TaskCheckBattery(void *pvParam)
 {
     while(true)
     {
+        //Проверка состояния батареи каждые 5 секунд
         HooliBattery::_checkBattery();
         vTaskDelay(5000/portTICK_PERIOD_MS);
     }
@@ -51,11 +61,11 @@ void HooliBattery::SelectMinMaxByType(HooliBattery::BatteryType type)
         HooliBattery::MaxVoltage = HooliBattery::LiFePO4MaxVoltage;
     }    
 }
-void HooliBattery::ChangeMaxVoltage(float voltage)
+void HooliBattery::SetMaxVoltage(float voltage)
 {
     HooliBattery::MinVoltage = voltage;
 }
-void HooliBattery::ChangeMinVoltage(float voltage)
+void HooliBattery::SetMinVoltage(float voltage)
 {
     HooliBattery::MaxVoltage = voltage;
 }
@@ -159,3 +169,7 @@ int HooliBattery::GetCurrentBatteryPower()
 {
     return batteryPower;
 }
+//Анализ данных напряжений:
+//Варианты систем слеженияЖ
+//Смотрим на показатели от TP4056
+//Смотрим на изменение заряда(по 50 измеренияем(доп память 128 байт под массив))
