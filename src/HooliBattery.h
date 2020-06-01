@@ -35,6 +35,21 @@ class HooliBattery{
         //resG - сопротивление нижнего плеча
         HooliBattery(int pin,BatteryType type,int resS,int resG);
 
+        //Пока что не известно,как это сделать
+        #pragma region HooliBatteryTP4056
+        //pin - Номер пина, к которому подключен резисторный делитель
+        //type - Тип батареи
+        //ChargeStatePin - номер пина,подключенного к индикатору зарядки(например к ноге STDBY у TP4056)
+        //HooliBattery(int pin,BatteryType type,int ChargeStatePin);
+
+        //pin - Номер пина, к которому подключен резисторный делитель
+        //type - Тип батареи
+        //resS - сопротивление верхнего плеча 
+        //resG - сопротивление нижнего плеча
+        //ChargeStatePin - номер пина,подключенного к индикатору зарядки(например к ноге STDBY у TP4056)
+        //HooliBattery(int pin,BatteryType type,int resS,int resG,int ChargeStatePin);
+        #pragma endregion HooliBatteryTP4056
+        
         //Установить минимальное напряжение при котором заряд батареи - 0%
         void SetMinVoltage(float voltage);
 
@@ -126,6 +141,12 @@ class HooliBattery{
 
         //Возведение в степень числа
         int Pow(int base,int st);
-        
+        static const int powerValueSize = 20;
+        //Добавляет значение заряда в массив
+        void addPowerValue(int value);
+
+        LifeCycle getPowerStatus();
+        //Последние 20 значений зарядки
+        int PowerValues[powerValueSize];
 };
 #endif

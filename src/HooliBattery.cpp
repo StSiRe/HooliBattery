@@ -169,7 +169,34 @@ int HooliBattery::GetCurrentBatteryPower()
 {
     return batteryPower;
 }
+
+
 //Анализ данных напряжений:
-//Варианты систем слеженияЖ
-//Смотрим на показатели от TP4056
-//Смотрим на изменение заряда(по 50 измеренияем(доп память 128 байт под массив))
+//Варианты систем слежения
+//Смотрим на изменение заряда(по 20 измеренияем(доп память 64 байт под массив))
+
+HooliBattery::LifeCycle HooliBattery::GetLifeCycle()
+{
+    return getPowerStatus();
+}
+void HooliBattery::addPowerValue(int value)
+{
+    for (size_t i = 0; i < powerValueSize - 1; i++) 
+    {
+        PowerValues[i] = PowerValues[i+1];
+    }
+    PowerValues[powerValueSize - 1] = value;
+}
+HooliBattery::LifeCycle HooliBattery::getPowerStatus()
+{
+    int sum = 0;    
+    for (size_t i = 0; i < powerValueSize; i++)
+    {
+        sum += PowerValues[i];
+    }
+    float average = (float)sum / powerValueSize;
+    if(average > PowerValues[0])
+        return LifeCycle::Charging;
+    else
+        return LifeCycle::Discharging;
+}
