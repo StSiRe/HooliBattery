@@ -155,6 +155,7 @@ void HooliBattery::_checkBattery()
             if(_on10)   _on10();
     }
     // It`s all:)
+    addPowerValue(batteryPower);
 }
 int HooliBattery::Pow(int base,int st)
 {
