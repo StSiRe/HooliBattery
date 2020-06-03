@@ -2,6 +2,7 @@
 #include <HooliBattery.h>
 //Номер пина, подключенный к делителю
 const int pin = A0;
+//Создаем объект нашей батареи
 HooliBattery Battery(pin,HooliBattery::BatteryType::LiIon);
 //Выполняется в случае полного заряда
 void Charged()
